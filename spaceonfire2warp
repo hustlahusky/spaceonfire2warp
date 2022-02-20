@@ -1,0 +1,24 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+namespace App;
+
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+
+require __DIR__ . '/src/bootstrap.php';
+
+$input = new ArgvInput();
+$output = new ConsoleOutput();
+$application = Cli::application();
+
+try {
+    $exitCode = $application->run($input, $output);
+} catch (\Throwable $e) {
+    $application->renderThrowable($e, $output->getErrorOutput());
+    $exitCode = 1;
+}
+
+exit(\max(\min(\abs($exitCode), 255), 0));

@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  dev:
+    profiles:
+      - development
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      args:
+        ALPINE_REPO: http://mirrors.edge.kernel.org/alpine/
+    entrypoint: [ 'sleep', 'infinite' ]
+    environment:
+      # See https://xdebug.org/docs/all_settings for more
+      XDEBUG_CONFIG: 'idekey=warp client_host=host.docker.internal log_level=0'
+      XDEBUG_MODE: '${XDEBUG_MODE:-debug}'
+    volumes:
+      - type: bind
+        source: ./
+        target: /home/warp/spaceonfire2warp
+    restart: unless-stopped
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  app:
+    profiles:
+      - production
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    entrypoint: [ 'sleep', 'infinite' ]
+    volumes:
+      - type: bind
+        source: ./tests/stubs
+        target: /app
+    restart: unless-stopped
